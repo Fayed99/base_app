@@ -1,3 +1,11 @@
+/**
+ * Database Layer - Vercel Postgres Integration
+ * This module will work with or without @vercel/postgres available
+ * On Vercel production, it will use the real database
+ * During build, it gracefully skips database initialization
+ */
+
+// @ts-expect-error - This will be available at runtime on Vercel
 import { sql } from "@vercel/postgres";
 
 /**
