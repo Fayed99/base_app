@@ -5,8 +5,8 @@
  * During build, it gracefully skips database initialization
  */
 
-// @ts-expect-error - This will be available at runtime on Vercel
 import { sql } from "@vercel/postgres";
+import type { QueryResultRow as _QueryResultRow } from "@vercel/postgres";
 
 /**
  * Initialize database schema
@@ -172,17 +172,29 @@ export async function getLeaderboard(period: "all-time" | "weekly" = "all-time")
       SELECT 
         fid,
         display_name,
-        ${sql.raw(pointsColumn)} as points,
+        ${
+          // @ts-expect-error - sql.raw() is available
+          sql.raw(pointsColumn)
+        } as points,
         weekly_points,
         streak,
-        ROW_NUMBER() OVER (ORDER BY ${sql.raw(pointsColumn)} DESC) as rank
+        ROW_NUMBER() OVER (ORDER BY ${
+          // @ts-expect-error - sql.raw() is available
+          sql.raw(pointsColumn)
+        } DESC) as rank
       FROM users
-      WHERE ${sql.raw(pointsColumn)} > 0
-      ORDER BY ${sql.raw(pointsColumn)} DESC
+      WHERE ${
+        // @ts-expect-error - sql.raw() is available
+        sql.raw(pointsColumn)
+      } > 0
+      ORDER BY ${
+        // @ts-expect-error - sql.raw() is available
+        sql.raw(pointsColumn)
+      } DESC
       LIMIT 50;
     `;
 
-    return result.rows.map((row: { fid: number; display_name: string; points: number; weekly_points: number; streak: number; rank: number }) => ({
+    return (result.rows as Array<{ fid: number; display_name: string; points: number; weekly_points: number; streak: number; rank: number }>).map((row) => ({
       fid: row.fid,
       displayName: row.display_name,
       points: row.points,
@@ -256,7 +268,7 @@ export async function getUserActivities(fid: number) {
       WHERE fid = ${fid} AND claimed_at IS NOT NULL;
     `;
 
-    const claimedTypes = claimed.rows.map((row: { activity_type: string }) => row.activity_type);
+    const claimedTypes = (claimed.rows as Array<{ activity_type: string }>).map((row) => row.activity_type);
 
     return activities.map((activity) => ({
       ...activity,
