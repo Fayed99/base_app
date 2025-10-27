@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// @ts-expect-error - Available at runtime on Vercel
 import { get } from '@vercel/edge-config';
 
 export const config = {

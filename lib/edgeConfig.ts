@@ -5,7 +5,6 @@
  * throughout your application
  */
 
-// @ts-expect-error - Available at runtime on Vercel
 import { get } from '@vercel/edge-config';
 
 /**
