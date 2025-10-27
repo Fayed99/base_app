@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getUserStats, addPointsToUser } from "@/lib/db";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { fid: string } }
+  _request: unknown,
+  { params }: { params: Promise<{ fid: string }> }
 ) {
   try {
-    const fid = parseInt(params.fid, 10);
+    const { fid: fidStr } = await params;
+    const fid = parseInt(fidStr, 10);
     if (isNaN(fid)) {
       return NextResponse.json(
         { error: "Invalid FID" },
@@ -26,12 +27,13 @@ export async function GET(
 }
 
 export async function POST(
-  request: NextRequest,
-  { params }: { params: { fid: string } }
+  request: unknown,
+  { params }: { params: Promise<{ fid: string }> }
 ) {
   try {
-    const fid = parseInt(params.fid, 10);
-    const body = await request.json();
+    const { fid: fidStr } = await params;
+    const fid = parseInt(fidStr, 10);
+    const body = await (request as { json: () => Promise<Record<string, unknown>> }).json();
     const { points, activityType } = body;
 
     if (isNaN(fid) || !points || !activityType) {
@@ -41,7 +43,7 @@ export async function POST(
       );
     }
 
-    const stats = await addPointsToUser(fid, points, activityType);
+    const stats = await addPointsToUser(fid, points as number, activityType as string);
     return NextResponse.json(stats);
   } catch (error) {
     console.error("Error updating user stats:", error);

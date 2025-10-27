@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getUserActivities } from "@/lib/db";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { fid: string } }
+  _request: unknown,
+  { params }: { params: Promise<{ fid: string }> }
 ) {
   try {
-    const fid = parseInt(params.fid, 10);
+    const { fid: fidStr } = await params;
+    const fid = parseInt(fidStr, 10);
     if (isNaN(fid)) {
       return NextResponse.json({ error: "Invalid FID" }, { status: 400 });
     }
